@@ -20,20 +20,18 @@ const int metrics = 8;
  */
 const int MAX_BOARD_SIZE = INT_MAX;
 
-bool start_game(player *p1, player *p2, int *number_of_rounds, int *board_size, char board[10][10]) {
+bool start_game(player *p1, player *p2, int *number_of_rounds, int *board_size, char board[10][10], int *ai_number) {
 
     bool tmp_bool = true;
     command *init1;
-    command *init2;
     init1 = malloc(sizeof(command));
-    init2 = malloc(sizeof(command));
 
-    init1 = parse_command(init1,&tmp_bool);
+    init1 = parse_command(init1, &tmp_bool);
     if (find_function(init1->name) != 1)
         tmp_bool = false;
 
     if (!(init1->data[0] > 8 && init1->data[0] <= MAX_BOARD_SIZE &&
-          init1->data[1] > 1 && init1->data[1] <= MAX_BOARD_SIZE &&
+          init1->data[1] >= 1 && init1->data[1] <= MAX_BOARD_SIZE &&
           (init1->data[2] == 1 || init1->data[2] == 2) &&
           init1->data[3] > 0 && init1->data[3] <= init1->data[0] - 3 &&
           init1->data[4] > 0 && init1->data[4] <= init1->data[0] &&
@@ -42,61 +40,36 @@ bool start_game(player *p1, player *p2, int *number_of_rounds, int *board_size, 
             )
         tmp_bool = false;
 
-    /*wrong kings positions*/
-    if (abs(init1->data[3] - init1->data[5]) + abs(init1->data[4] - init1->data[6]) < metrics)
+    /*wrong kings positions*/;
+    if (abs(init1->data[3] - init1->data[5]) < metrics && abs(init1->data[4] - init1->data[6]) < metrics){
         tmp_bool = false;
+    }
 
-    if(tmp_bool) {
+    if (tmp_bool) {
         init_topleft(init1->data[3], init1->data[4], init1->data[5], init1->data[6], board);
-        print_topleft(board, init1->data[0]);
-        printf("\n");
 
-        init2 = parse_command(init2, &tmp_bool);
-        if (find_function(init2->name) != 1)
-            tmp_bool = false;
-        if (!(init2->data[0] > 8 && init2->data[0] <= MAX_BOARD_SIZE &&
-              init2->data[1] > 1 && init2->data[1] <= MAX_BOARD_SIZE &&
-              (init2->data[2] == 1 || init2->data[2] == 2) &&
-              init2->data[3] > 0 && init2->data[3] <= init2->data[0] - 3 &&
-              init2->data[4] > 0 && init2->data[4] <= init2->data[0] &&
-              init2->data[5] > 0 && init2->data[5] <= init2->data[0] - 3 &&
-              init2->data[6] > 0 && init2->data[6] <= init2->data[0]) && tmp_bool
-                )
-            tmp_bool = false;
+        if(init1->data[2] == 1)
+            *ai_number = 1;
+        else
+            *ai_number = 2;
 
-        if ((init1->data[0] == init2->data[0]) &&
-            (init1->data[1] == init2->data[1]) &&
-            (init1->data[2] != init2->data[2]) &&
-            (init1->data[3] == init2->data[3]) &&
-            (init1->data[4] == init2->data[4]) &&
-            (init1->data[5] == init2->data[5]) &&
-            (init1->data[6] == init2->data[6]) &&
-            (init1->data[2] == 1 || init1->data[2] == 2) &&
-            (init2->data[2] == 1 || init2->data[2] == 2)
-                ) {
-            /*we checked that init1->data[2] != init2->data[2] && init{1,2}->data[2] = {1,2}*/
-            p1->number = first;
-            p2->number = second;
+        /*we checked that init1->data[2] != init2->data[2] && init{1,2}->data[2] = {1,2}*/
+        p1->number = first;
+        p2->number = second;
 
-            *board_size = init1->data[0];
-            *number_of_rounds = init1->data[1];
+        *board_size = init1->data[0];
+        *number_of_rounds = init1->data[1];
 
 
-            make_player(p1, init1->data[3], init1->data[4]);
-            make_player(p2, init1->data[5], init1->data[6]);
+        make_player(p1, init1->data[3], init1->data[4]);
+        make_player(p2, init1->data[5], init1->data[6]);
 
-            if(tmp_bool) {
-                print_topleft(board, *board_size);
-                printf("\n");
-            }
-        }
-        else {
-            tmp_bool = false;
-        }
+    }
+    else {
+        tmp_bool = false;
     }
 
     free(init1);
-    free(init2);
     return tmp_bool;
 }
 

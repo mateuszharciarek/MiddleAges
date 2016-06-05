@@ -94,7 +94,7 @@ typedef struct def_game {
  * @param board keep top left corner of the board (in a established characters)
  * @return true if function was executed without anny input errors\n false if function find input error
  */
-bool start_game(player *p1, player *p2, int *number_of_rounds, int *board_size, char board[10][10]);
+bool start_game(player *p1, player *p2, int *number_of_rounds, int *board_size, char board[10][10], int *ai_number);
 
 /**
  * We know figures position only by KING position so we can add figures to list of figures of given player.
